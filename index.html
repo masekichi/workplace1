@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Date | 本日の日付 & リアルタイムクロック</title>
+    <meta name="description" content="今日の日付、和暦（令和）、時間、カレンダー、世界の時間を一元表示するプレミアム・デイト＆タイムダッシュボード">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Ambient Background Animation -->
+    <div class="ambient-background">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i data-lucide="calendar-heart" class="logo-icon"></i>
+                <span>Chronos Today</span>
+            </div>
+            <div class="header-actions">
+                <button id="themeToggleBtn" class="icon-btn" title="テーマ切り替え">
+                    <i data-lucide="sun" id="themeIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <main class="main-content">
+            <!-- Main Hero Card: Date & Time Display -->
+            <section class="card hero-card">
+                <div class="hero-header">
+                    <div class="badge-group">
+                        <span class="badge" id="eraBadge">令和 8年</span>
+                        <span class="badge badge-accent" id="dayOfYearBadge">2026年 第--日目</span>
+                        <span class="badge badge-outline" id="weekNumberBadge">第--週</span>
+                    </div>
+                    <button id="copyDateBtn" class="copy-btn" title="日付をクリップボードにコピー">
+                        <i data-lucide="copy"></i>
+                        <span>コピー</span>
+                    </button>
+                </div>
+
+                <div class="date-display">
+                    <div class="main-date" id="mainDate">2026年8月10日</div>
+                    <div class="main-day" id="mainDay">月曜日 <span class="en-day" id="enDay">Monday</span></div>
+                </div>
+
+                <div class="time-display-container">
+                    <div class="time-display" id="timeDisplay">
+                        <span id="hours">12</span>:<span id="minutes">50</span>:<span id="seconds">00</span>
+                        <span id="ampm" class="ampm">AM</span>
+                    </div>
+                </div>
+
+                <!-- Controls Toolbar -->
+                <div class="toolbar">
+                    <div class="toggle-group">
+                        <label class="toggle-label">フォーマット:</label>
+                        <button class="segmented-btn active" data-format="ja">日本語</button>
+                        <button class="segmented-btn" data-format="en">English</button>
+                        <button class="segmented-btn" data-format="iso">ISO 8601</button>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-label">時間形式:</label>
+                        <button class="segmented-btn active" id="toggle24h">24時間</button>
+                        <button class="segmented-btn" id="toggle12h">12時間</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Side Column: Calendar & Stats -->
+            <div class="side-column">
+                <!-- Mini Calendar Card -->
+                <section class="card calendar-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i data-lucide="calendar"></i>
+                            <span id="calendarMonthYear">2026年 8月</span>
+                        </div>
+                        <div class="calendar-nav">
+                            <button id="prevMonthBtn" class="mini-btn"><i data-lucide="chevron-left"></i></button>
+                            <button id="todayBtn" class="today-tag">今日</button>
+                            <button id="nextMonthBtn" class="mini-btn"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid-header">
+                        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+                    </div>
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- JS populated -->
+                    </div>
+                </section>
+
+                <!-- Year Progress Card -->
+                <section class="card progress-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i data-lucide="hourglass"></i>
+                            <span>今年の経過率</span>
+                        </div>
+                        <span class="progress-percent" id="yearProgressPercent">60.8%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="yearProgressBar" style="width: 60.8%;"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <div>経過: <strong id="daysPassed">222</strong> 日</div>
+                        <div>残り: <strong id="daysRemaining">143</strong> 日</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- World Clock Section -->
+            <section class="card world-clock-card full-width">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i data-lucide="globe"></i>
+                        <span>世界の時間 (World Clock)</span>
+                    </div>
+                </div>
+                <div class="world-clock-grid" id="worldClockGrid">
+                    <div class="clock-city-card" data-tz="Asia/Tokyo">
+                        <div class="city-name">東京 (Tokyo)</div>
+                        <div class="city-time">12:50</div>
+                        <div class="city-date">8月10日 (月)</div>
+                        <div class="city-offset">JST (UTC+9)</div>
+                    </div>
+                    <div class="clock-city-card" data-tz="America/New_York">
+                        <div class="city-name">ニューヨーク (NY)</div>
+                        <div class="city-time">23:50</div>
+                        <div class="city-date">8月9日 (日)</div>
+                        <div class="city-offset">EDT (UTC-4)</div>
+                    </div>
+                    <div class="clock-city-card" data-tz="Europe/London">
+                        <div class="city-name">ロンドン (London)</div>
+                        <div class="city-time">04:50</div>
+                        <div class="city-date">8月10日 (月)</div>
+                        <div class="city-offset">BST (UTC+1)</div>
+                    </div>
+                    <div class="clock-city-card" data-tz="Europe/Paris">
+                        <div class="city-name">パリ (Paris)</div>
+                        <div class="city-time">05:50</div>
+                        <div class="city-date">8月10日 (月)</div>
+                        <div class="city-offset">CEST (UTC+2)</div>
+                    </div>
+                    <div class="clock-city-card" data-tz="Australia/Sydney">
+                        <div class="city-name">シドニー (Sydney)</div>
+                        <div class="city-time">13:50</div>
+                        <div class="city-date">8月10日 (月)</div>
+                        <div class="city-offset">AEST (UTC+10)</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2026 Chronos Today • Created with Antigravity AI</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle-2"></i>
+        <span id="toastMsg">クリップボードにコピーしました！</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
