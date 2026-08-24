@@ -1,5 +1,5 @@
 /* ==========================================================================
-   IDOL TV LIVE - Continuous YouTube Broadcast Engine & Interactive Logic
+   IDOL TV LIVE - Continuous YouTube Broadcast Engine & Nico Cruise Logic
    ========================================================================== */
 
 // --- Pre-Curated Channel Playlists (Verified Embeddable YouTube Video IDs) ---
@@ -51,23 +51,31 @@ let player = null;
 let isPlayerReady = false;
 let isDanmakuEnabled = true;
 let isOverlaysEnabled = true;
+let isCruiseMode = true;
 let progressUpdateTimer = null;
 let onlineViewers = 1248;
 
+// --- Nico Cruise Poll State ---
+let isPollActive = false;
+let pollCountdownSeconds = 20;
+let pollTimerInterval = null;
+let pollNextVotes = 65;
+let pollStayVotes = 35;
+let userHasVoted = false;
+
 // --- Fan Comment Pool for Live Atmosphere ---
 const FAN_COMMENTS = [
-    { name: "みーちゃん推し", text: "推しが尊すぎて直視できない😭✨", badge: "ファン暦3年" },
-    { name: "サクラ坂ファン", text: "この表現力とダンスのキレ最高すぎる！", badge: "VIP" },
-    { name: "おひさまパパ", text: "コール入れたくなるｗｗｗ", badge: "LIVE参戦組" },
+    { name: "クルーズ乗組員 #04", text: "推しが尊すぎて直視できない😭✨", badge: "乗組員" },
+    { name: "サクラ坂ファン", text: "この表現力とダンスのキレ最高すぎる！", badge: "VIP乗組員" },
+    { name: "おひさまパパ", text: "次のアイドルへ出航投票した！ｗｗｗ", badge: "投票済み" },
     { name: "アイドルヲタA", text: "神曲きたああああ＼(^o^)/", badge: "常連" },
     { name: "乃木坂DD", text: "イントロから鳥肌立つレベルで好き", badge: "ガチ勢" },
-    { name: "トキメキLOVE", text: "衣装めっちゃかわいくない！？❤️", badge: "ファン" },
-    { name: "ライブ最高", text: "24時間流しっぱなしにできるの神サイトだわ", badge: "プレミアム" },
+    { name: "トキメキLOVE", text: "次どこに寄港するのか楽しみ！⚓️", badge: "乗組員" },
+    { name: "ライブ最高", text: "クルーズ機能懐かしすぎてテンション上がるｗ", badge: "ニコ生世代" },
     { name: "フルッパー", text: "みんな可愛すぎて語彙力消えた", badge: "推し活中" }
 ];
 
 // --- Global Master Clock Sync Algorithm ---
-// Calculate exact current video and seek position so ALL viewers worldwide watch the EXACT SAME second!
 function getGlobalSyncPosition() {
     const channel = CHANNELS[currentChannelKey];
     let totalDuration = 0;
@@ -81,7 +89,6 @@ function getGlobalSyncPosition() {
 
     if (totalDuration === 0) return { index: 0, seek: 0 };
 
-    // Global Fixed Epoch Timestamp (2026-01-01T00:00:00Z)
     const MASTER_EPOCH_SEC = 1767225600;
     const currentUnixSec = Math.floor(Date.now() / 1000);
     const elapsed = Math.max(0, currentUnixSec - MASTER_EPOCH_SEC);
@@ -116,7 +123,6 @@ function checkAndInitPlayer() {
 function initPlayer() {
     if (player) return;
     
-    // Calculate global sync position
     const syncPos = getGlobalSyncPosition();
     currentVideoIndex = syncPos.index;
     const initialVideo = CHANNELS[currentChannelKey].videos[currentVideoIndex];
@@ -147,7 +153,6 @@ function onPlayerReady(event) {
     isPlayerReady = true;
     console.log("Player is Ready");
     
-    // Seek to exact global time offset
     const syncPos = getGlobalSyncPosition();
     if (syncPos.seek > 0 && typeof player.seekTo === 'function') {
         player.seekTo(syncPos.seek, true);
@@ -156,7 +161,6 @@ function onPlayerReady(event) {
     updateUIWithCurrentVideo();
     startProgressTimer();
 
-    // Check if user already clicked start broadcast overlay
     const overlay = document.getElementById('startOverlay');
     if (overlay && overlay.classList.contains('hidden')) {
         player.unMute();
@@ -167,7 +171,8 @@ function onPlayerReady(event) {
 // Key Event: Continuous Auto-Playback Hook
 function onPlayerStateChange(event) {
     if (event.data === YT.PlayerState.ENDED) {
-        console.log("Video ended. Play next track automatically!");
+        console.log("Video ended. Cruise sailing to next track!");
+        closeCruisePoll();
         playNextVideo();
     } else if (event.data === YT.PlayerState.PLAYING) {
         updatePlayPauseButtonIcon(true);
@@ -179,14 +184,105 @@ function onPlayerStateChange(event) {
 
 function onPlayerError(event) {
     console.warn("YouTube Player Error code:", event.data, "Video cannot be embedded in 3rd party site. Auto-skipping to next video...");
+    closeCruisePoll();
     setTimeout(() => {
         playNextVideo();
     }, 400);
 }
 
+// --- Nico Cruise Voting Poll Engine ---
+function triggerCruisePoll() {
+    if (isPollActive || !isCruiseMode) return;
+    isPollActive = true;
+    userHasVoted = false;
+    pollCountdownSeconds = 20;
+
+    // Initial randomized vote percentages
+    pollNextVotes = Math.floor(Math.random() * 25) + 55; // 55% - 80%
+    pollStayVotes = 100 - pollNextVotes;
+
+    updatePollUI();
+    const pollCard = document.getElementById('cruisePollCard');
+    if (pollCard) pollCard.classList.remove('hidden');
+
+    // Announce Cruise Poll
+    const nextVideo = CHANNELS[currentChannelKey].videos[(currentVideoIndex + 1) % CHANNELS[currentChannelKey].videos.length];
+    appendChatMessage("⚓️ クルーズBOT", `【アンケート発動中】次の寄港地『${nextVideo.artist} - ${nextVideo.title}』へ出航しますか？`, "CRUISE BOT", false);
+
+    if (pollTimerInterval) clearInterval(pollTimerInterval);
+    pollTimerInterval = setInterval(() => {
+        pollCountdownSeconds--;
+        const countEl = document.getElementById('pollCountdown');
+        if (countEl) countEl.textContent = pollCountdownSeconds;
+
+        // Fluctuate votes slightly
+        if (Math.random() < 0.6) {
+            pollNextVotes += (Math.random() > 0.4 ? 1 : -1);
+            pollNextVotes = Math.min(90, Math.max(30, pollNextVotes));
+            pollStayVotes = 100 - pollNextVotes;
+            updatePollUI();
+        }
+
+        if (pollCountdownSeconds <= 0) {
+            clearInterval(pollTimerInterval);
+            finishCruisePoll();
+        }
+    }, 1000);
+}
+
+function updatePollUI() {
+    const nextPctEl = document.getElementById('voteNextPct');
+    const stayPctEl = document.getElementById('voteStayPct');
+    const nextBarEl = document.getElementById('voteNextBar');
+    const stayBarEl = document.getElementById('voteStayBar');
+
+    if (nextPctEl) nextPctEl.textContent = `${pollNextVotes}%`;
+    if (stayPctEl) stayPctEl.textContent = `${pollStayVotes}%`;
+    if (nextBarEl) nextBarEl.style.width = `${pollNextVotes}%`;
+    if (stayBarEl) stayBarEl.style.width = `${pollStayVotes}%`;
+}
+
+function voteCruise(option) {
+    if (userHasVoted) return;
+    userHasVoted = true;
+
+    if (option === 'next') {
+        pollNextVotes += 3;
+        pollStayVotes = Math.max(0, 100 - pollNextVotes);
+        document.getElementById('voteNextBtn').classList.add('voted');
+        appendChatMessage("あなた (乗組員)", "投票完了: 次の動画へ出航！ ⛵️", "乗組員", true);
+    } else {
+        pollStayVotes += 3;
+        pollNextVotes = Math.max(0, 100 - pollStayVotes);
+        document.getElementById('voteStayBtn').classList.add('voted');
+        appendChatMessage("あなた (乗組員)", "投票完了: この曲を最後まで見る 🎵", "乗組員", true);
+    }
+    updatePollUI();
+}
+
+function finishCruisePoll() {
+    closeCruisePoll();
+    if (pollNextVotes >= 50) {
+        appendChatMessage("⚓️ クルーズBOT", `得票率 ${pollNextVotes}% で「次の動画へ出航」が決定しました！面舵一杯！⛵️`, "CRUISE BOT", false);
+        playNextVideo();
+    } else {
+        appendChatMessage("⚓️ クルーズBOT", `得票率 ${pollStayVotes}% で「完奏」が決定しました！そのままお楽しみください🎵`, "CRUISE BOT", false);
+    }
+}
+
+function closeCruisePoll() {
+    isPollActive = false;
+    if (pollTimerInterval) clearInterval(pollTimerInterval);
+    const pollCard = document.getElementById('cruisePollCard');
+    if (pollCard) pollCard.classList.add('hidden');
+    document.getElementById('voteNextBtn').classList.remove('voted');
+    document.getElementById('voteStayBtn').classList.remove('voted');
+}
+
 // Sync to global clock manually
 function syncToGlobalClock() {
     if (!isPlayerReady || !player) return;
+    closeCruisePoll();
     const syncPos = getGlobalSyncPosition();
     if (syncPos.index !== currentVideoIndex) {
         currentVideoIndex = syncPos.index;
@@ -200,6 +296,7 @@ function syncToGlobalClock() {
 
 // --- Navigation & Playback Logic ---
 function playVideoAtIndex(index) {
+    closeCruisePoll();
     const channel = CHANNELS[currentChannelKey];
     if (index < 0) index = channel.videos.length - 1;
     if (index >= channel.videos.length) index = 0;
@@ -225,17 +322,15 @@ function playPrevVideo() {
 function switchChannel(channelKey) {
     if (!CHANNELS[channelKey]) return;
     currentChannelKey = channelKey;
+    closeCruisePoll();
     
-    // Recalculate sync position for new channel
     const syncPos = getGlobalSyncPosition();
     currentVideoIndex = syncPos.index;
 
-    // Update Channel Tabs Active Class
     document.querySelectorAll('.channel-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.channel === channelKey);
     });
 
-    // Update Ticker Text
     document.getElementById('tickerText').textContent = CHANNELS[channelKey].ticker;
 
     if (isPlayerReady && player) {
@@ -251,17 +346,14 @@ function updateUIWithCurrentVideo() {
     const video = channel.videos[currentVideoIndex];
     const nextVideo = channel.videos[(currentVideoIndex + 1) % channel.videos.length];
 
-    // Category Tag & Program Name
     document.getElementById('overlayCategory').textContent = channel.category;
     document.getElementById('overlayProgramName').textContent = channel.name;
 
-    // Now Playing Banner
     document.getElementById('npTitle').textContent = video.title;
     document.getElementById('npArtist').textContent = video.artist;
     document.getElementById('npTag').textContent = video.tag || "おすすめMV";
     document.getElementById('npDuration').textContent = video.duration || "--:--";
 
-    // Next Up Preview
     document.getElementById('nextTitle').textContent = `${nextVideo.artist}「${nextVideo.title}」`;
 
     renderPlaylistQueue();
@@ -283,7 +375,7 @@ function renderPlaylistQueue() {
                     <div class="queue-artist">${vid.artist}</div>
                 </div>
                 <div class="queue-status-badge">
-                    ${isActive ? '生放送中' : '#' + (idx + 1)}
+                    ${isActive ? '寄港中' : '#' + (idx + 1)}
                 </div>
             </div>
         `;
@@ -313,6 +405,12 @@ function startProgressTimer() {
         if (duration > 0) {
             const pct = (currentTime / duration) * 100;
             document.getElementById('progressBarFill').style.width = pct + '%';
+
+            // Trigger Cruise Voting Poll during final 35 seconds of video
+            const remaining = duration - currentTime;
+            if (remaining <= 35 && remaining > 5 && !isPollActive && isCruiseMode) {
+                triggerCruisePoll();
+            }
         }
     }, 500);
 }
@@ -324,7 +422,7 @@ function formatSeconds(sec) {
 }
 
 // --- Realtime Simulated Chat & Screen Danmaku ---
-function appendChatMessage(user, text, badge = "ファン", isMe = false) {
+function appendChatMessage(user, text, badge = "乗組員", isMe = false) {
     const chatBox = document.getElementById('chatMessages');
     if (!chatBox) return;
 
@@ -346,7 +444,6 @@ function appendChatMessage(user, text, badge = "ファン", isMe = false) {
     chatBox.appendChild(msgEl);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Trigger Danmaku (Screen Telop Comment) if enabled
     if (isDanmakuEnabled) {
         spawnDanmakuText(text, isMe);
     }
@@ -395,7 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     checkAndInitPlayer();
 
-    // Live Digital Clock Tick
     setInterval(() => {
         const now = new Date();
         const timeStr = now.toTimeString().split(' ')[0];
@@ -410,16 +506,31 @@ document.addEventListener('DOMContentLoaded', () => {
             checkAndInitPlayer();
         }
         if (isPlayerReady && player) {
-            syncToGlobalClock();
             player.unMute();
             player.playVideo();
         }
     });
 
-    // Sync Now Button
-    document.getElementById('syncNowBtn').addEventListener('click', () => {
-        syncToGlobalClock();
+    // Toggle Cruise Mode Button
+    const toggleCruiseBtn = document.getElementById('toggleCruiseBtn');
+    toggleCruiseBtn.addEventListener('click', () => {
+        isCruiseMode = !isCruiseMode;
+        toggleCruiseBtn.classList.toggle('active', isCruiseMode);
+        document.getElementById('cruiseModeBadge').style.display = isCruiseMode ? 'flex' : 'none';
+        toggleCruiseBtn.innerHTML = `<i data-lucide="ship"></i> クルーズモード: ${isCruiseMode ? 'ON' : 'OFF'}`;
+        if (window.lucide) lucide.createIcons();
+        if (!isCruiseMode) closeCruisePoll();
     });
+
+    // Force Sail Next Button
+    document.getElementById('forceSailBtn').addEventListener('click', () => {
+        appendChatMessage("あなた (乗組員)", "面舵一杯！次の寄港地へ即時出航！ ⛵️", "乗組員", true);
+        playNextVideo();
+    });
+
+    // Cruise Poll Buttons
+    document.getElementById('voteNextBtn').addEventListener('click', () => voteCruise('next'));
+    document.getElementById('voteStayBtn').addEventListener('click', () => voteCruise('stay'));
 
     // Channel Switchers
     document.querySelectorAll('.channel-btn').forEach(btn => {
@@ -507,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if (text) {
-            appendChatMessage("あなた (You)", text, "ファン", true);
+            appendChatMessage("あなた (乗組員)", text, "乗組員", true);
             input.value = '';
         }
     });
@@ -532,7 +643,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const artist = document.getElementById('videoArtistInput').value.trim();
         const tag = document.getElementById('videoTagInput').value;
 
-        // Simple YouTube ID Extractor
         let videoId = urlOrId;
         if (urlOrId.includes('v=')) {
             videoId = urlOrId.split('v=')[1].split('&')[0];
@@ -552,15 +662,13 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPlaylistQueue();
             modal.classList.remove('show');
             document.getElementById('addVideoForm').reset();
-            alert(`「${newVideo.title}」を放送プレイリストに追加しました！`);
+            alert(`「${newVideo.title}」をクルーズ巡回ルートに追加しました！`);
         }
     });
 
-    // Initialize Initial Chat Messages
-    appendChatMessage("みーちゃん推し", "今日もお疲れ様〜！画面流しっぱなしにして作業する！", "ファン", false);
-    appendChatMessage("サクラ坂ファン", "画質と音質良くて最高！次の曲楽しみ", "VIP", false);
+    appendChatMessage("みーちゃん推し", "アイドルクルーズ出航キター！！乗船します！⚓️", "乗組員", false);
+    appendChatMessage("サクラ坂ファン", "終盤のアンケートで次の動画決めるシステム面白すぎｗ", "VIP乗組員", false);
 
-    // Initialize Icons & Simulated Chat
     if (window.lucide) lucide.createIcons();
     startSimulatedFanChat();
 });
