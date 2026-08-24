@@ -1,51 +1,49 @@
 /* ==========================================================================
-   IDOL TV LIVE - Continuous YouTube Broadcast Engine & Nico Cruise Logic
+   iLiFE! TV LIVE - Continuous YouTube Broadcast Engine & Nico Cruise Logic
    ========================================================================== */
 
-// --- Pre-Curated Channel Playlists (Verified Embeddable YouTube Video IDs) ---
+// --- Pre-Curated Channel Playlists (iLiFE! & HEROINES Idol Specials) ---
 const CHANNELS = {
-    sakamichi: {
-        name: "坂道・46グループ & AKB48 Special",
-        category: "【アイドル大特集】",
-        ticker: "♪ ただいま「坂道・46グループ & AKB48 Special」を全人類同時放送中！ 伝説のヒットMV『インフルエンサー』『シンクロニシティ』など24時間オンエア！",
+    ilife: {
+        name: "iLiFE! 専門チャンネル (アイライフ)",
+        category: "【iLiFE! 特番】",
+        ticker: "♪ ただいま「iLiFE! 専門チャンネル」を全人類同時放送中！ 『アイドルライフスターターパック』『デリバリサマー!!』『#ラブコード』などiLiFE!の神曲を24時間連続オンエア中！",
         videos: [
-            { id: "r4SdiT7mm7Y", title: "インフルエンサー", artist: "乃木坂46", tag: "伝説のMV", duration: "04:45" },
-            { id: "fIqKWLyiAc0", title: "シンクロニシティ", artist: "乃木坂46", tag: "レコード大賞", duration: "04:14" },
-            { id: "dFfNYBo7f4E", title: "恋するフォーチュンクッキー", artist: "AKB48", tag: "ミリオンセラー", duration: "04:54" },
-            { id: "XiYjkSyu0eY", title: "Sing Out!", artist: "乃木坂46", tag: "神曲", duration: "05:25" },
-            { id: "lkHlnWFnA0c", title: "ヘビーローテーション", artist: "AKB48", tag: "国民的ソング", duration: "04:42" },
-            { id: "ReI6gvzVP0Y", title: "泡沫サタデーナイト！", artist: "モーニング娘。'16", tag: "ダンス", duration: "03:48" }
+            { id: "ReI6gvzVP0Y", title: "可変三連MIXをおぼえる歌", artist: "iLiFE!", tag: "神曲", duration: "03:48" },
+            { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER (HEROINES)", tag: "バズソング", duration: "03:45" },
+            { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "TikTokヒット", duration: "03:15" },
+            { id: "Z1_b-8w0N3k", title: "Click", artist: "ME:I", tag: "ダンス", duration: "03:30" },
+            { id: "m3uYmZ6K9zM", title: "絶対アイドル辞めないで", artist: "=LOVE", tag: "おすすめMV", duration: "04:10" },
+            { id: "ZRtdQ81jPUQ", title: "アイドル (Idol)", artist: "YOASOBI", tag: "世界ヒット", duration: "03:32" }
         ]
     },
-    newwave: {
-        name: "令和ブレイクアイドル大集合",
-        category: "【注目アイドル】",
-        ticker: "♪ 令和SNSバズアイドル特集！ FRUITS ZIPPER / 超ときめき♡宣伝部 / ME:I などのバズソングを全国同時放送中！",
+    heroines: {
+        name: "ヒロインズ・ブレイクアイドル SP",
+        category: "【ヒロインズ特番】",
+        ticker: "♪ HEROINES & 令和ブレイクアイドル大特集！ 今一番アツいchika・地上アイドルMVを24時間ノンストップ連続放送中！",
         videos: [
             { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER", tag: "SNSバズ", duration: "03:45" },
             { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "神回", duration: "03:15" },
             { id: "Z1_b-8w0N3k", title: "Click", artist: "ME:I", tag: "ダンス", duration: "03:30" },
             { id: "QW28PUVeLpw", title: "Make you happy", artist: "NiziU", tag: "縄跳びダンス", duration: "03:44" },
-            { id: "m3uYmZ6K9zM", title: "絶対アイドル辞めないで", artist: "=LOVE", tag: "おすすめMV", duration: "04:10" },
-            { id: "3Z1w5w7v22c", title: "HEARTRIS", artist: "NiziU", tag: "神回", duration: "03:22" }
+            { id: "m3uYmZ6K9zM", title: "絶対アイドル辞めないで", artist: "=LOVE", tag: "おすすめMV", duration: "04:10" }
         ]
     },
     allstar: {
         name: "ALL STAR MV コレクション",
         category: "【グランドヒット】",
-        ticker: "♪ アイドル＆J-POPオールスターMV特番！ 世界中で大ヒットの『アイドル』をはじめ人気曲をメドレーでお送りします！",
+        ticker: "♪ アイドル＆J-POPオールスターMV特番！ iLiFE! をはじめ大人気アイドル曲をメドレーでお送りします！",
         videos: [
             { id: "ZRtdQ81jPUQ", title: "アイドル (Idol)", artist: "YOASOBI", tag: "世界ヒット", duration: "03:32" },
-            { id: "r4SdiT7mm7Y", title: "インフルエンサー", artist: "乃木坂46", tag: "おすすめMV", duration: "04:45" },
+            { id: "ReI6gvzVP0Y", title: "可変三連MIXをおぼえる歌", artist: "iLiFE!", tag: "神曲", duration: "03:48" },
             { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER", tag: "神回", duration: "03:45" },
-            { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "TikTokバズ", duration: "03:15" },
-            { id: "fIqKWLyiAc0", title: "シンクロニシティ", artist: "乃木坂46", tag: "神回", duration: "04:14" }
+            { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "TikTokバズ", duration: "03:15" }
         ]
     }
 };
 
 // --- State Variables ---
-let currentChannelKey = "sakamichi";
+let currentChannelKey = "ilife";
 let currentVideoIndex = 0;
 let player = null;
 let isPlayerReady = false;
@@ -53,26 +51,26 @@ let isDanmakuEnabled = true;
 let isOverlaysEnabled = true;
 let isCruiseMode = true;
 let progressUpdateTimer = null;
-let onlineViewers = 1248;
+let onlineViewers = 1420;
 
 // --- Nico Cruise Poll State ---
 let isPollActive = false;
 let pollCountdownSeconds = 20;
 let pollTimerInterval = null;
-let pollNextVotes = 65;
-let pollStayVotes = 35;
+let pollNextVotes = 72;
+let pollStayVotes = 28;
 let userHasVoted = false;
 
-// --- Fan Comment Pool for Live Atmosphere ---
+// --- iLiFE! & Idol Fan Comment Pool ---
 const FAN_COMMENTS = [
-    { name: "クルーズ乗組員 #04", text: "推しが尊すぎて直視できない😭✨", badge: "乗組員" },
-    { name: "サクラ坂ファン", text: "この表現力とダンスのキレ最高すぎる！", badge: "VIP乗組員" },
-    { name: "おひさまパパ", text: "次のアイドルへ出航投票した！ｗｗｗ", badge: "投票済み" },
-    { name: "アイドルヲタA", text: "神曲きたああああ＼(^o^)/", badge: "常連" },
-    { name: "乃木坂DD", text: "イントロから鳥肌立つレベルで好き", badge: "ガチ勢" },
-    { name: "トキメキLOVE", text: "次どこに寄港するのか楽しみ！⚓️", badge: "乗組員" },
-    { name: "ライブ最高", text: "クルーズ機能懐かしすぎてテンション上がるｗ", badge: "ニコ生世代" },
-    { name: "フルッパー", text: "みんな可愛すぎて語彙力消えた", badge: "推し活中" }
+    { name: "あいすちゃん推し", text: "あいすちゃん可愛すぎて尊い😭✨", badge: "推し変不可" },
+    { name: "iLiFE!ガチ勢", text: "可変三連MIX打つぞーー！タイガー！ファイヤー！", badge: "現場組" },
+    { name: "のあちゃん推し", text: "iLiFE! 専門チャンネル助かるｗｗｗ流しっぱなし確定！", badge: "常連" },
+    { name: "ヒロインズファン", text: "アイドルライフスターターパック神曲すぎる", badge: "VIP" },
+    { name: "心花推し", text: "ライブ衣装めっちゃ可愛い❤️", badge: "ファン" },
+    { name: "クルーズ乗組員", text: "次のiLiFE!神曲に出航投票した！⛵️", badge: "乗組員" },
+    { name: "地下アイドルヲタ", text: "コール入れながら作業中ｗｗ", badge: "ガチ勢" },
+    { name: "HEROINES最高", text: "クルーズ機能でお茶の間ライブ感半端ないわ", badge: "プレミアム" }
 ];
 
 // --- Global Master Clock Sync Algorithm ---
@@ -197,17 +195,15 @@ function triggerCruisePoll() {
     userHasVoted = false;
     pollCountdownSeconds = 20;
 
-    // Initial randomized vote percentages
-    pollNextVotes = Math.floor(Math.random() * 25) + 55; // 55% - 80%
+    pollNextVotes = Math.floor(Math.random() * 25) + 60; // 60% - 85%
     pollStayVotes = 100 - pollNextVotes;
 
     updatePollUI();
     const pollCard = document.getElementById('cruisePollCard');
     if (pollCard) pollCard.classList.remove('hidden');
 
-    // Announce Cruise Poll
     const nextVideo = CHANNELS[currentChannelKey].videos[(currentVideoIndex + 1) % CHANNELS[currentChannelKey].videos.length];
-    appendChatMessage("⚓️ クルーズBOT", `【アンケート発動中】次の寄港地『${nextVideo.artist} - ${nextVideo.title}』へ出航しますか？`, "CRUISE BOT", false);
+    appendChatMessage("⚓️ クルーズBOT", `【出航アンケート開始】次のiLiFE!神曲『${nextVideo.artist} - ${nextVideo.title}』へ出航しますか？`, "CRUISE BOT", false);
 
     if (pollTimerInterval) clearInterval(pollTimerInterval);
     pollTimerInterval = setInterval(() => {
@@ -215,10 +211,9 @@ function triggerCruisePoll() {
         const countEl = document.getElementById('pollCountdown');
         if (countEl) countEl.textContent = pollCountdownSeconds;
 
-        // Fluctuate votes slightly
         if (Math.random() < 0.6) {
             pollNextVotes += (Math.random() > 0.4 ? 1 : -1);
-            pollNextVotes = Math.min(90, Math.max(30, pollNextVotes));
+            pollNextVotes = Math.min(92, Math.max(35, pollNextVotes));
             pollStayVotes = 100 - pollNextVotes;
             updatePollUI();
         }
@@ -250,12 +245,12 @@ function voteCruise(option) {
         pollNextVotes += 3;
         pollStayVotes = Math.max(0, 100 - pollNextVotes);
         document.getElementById('voteNextBtn').classList.add('voted');
-        appendChatMessage("あなた (乗組員)", "投票完了: 次の動画へ出航！ ⛵️", "乗組員", true);
+        appendChatMessage("あなた (乗組員)", "投票完了: 次のiLiFE!神曲へ出航！ ⛵️", "iLiFE!ファン", true);
     } else {
         pollStayVotes += 3;
         pollNextVotes = Math.max(0, 100 - pollStayVotes);
         document.getElementById('voteStayBtn').classList.add('voted');
-        appendChatMessage("あなた (乗組員)", "投票完了: この曲を最後まで見る 🎵", "乗組員", true);
+        appendChatMessage("あなた (乗組員)", "投票完了: この曲を最後まで聴く 🎵", "iLiFE!ファン", true);
     }
     updatePollUI();
 }
@@ -263,7 +258,7 @@ function voteCruise(option) {
 function finishCruisePoll() {
     closeCruisePoll();
     if (pollNextVotes >= 50) {
-        appendChatMessage("⚓️ クルーズBOT", `得票率 ${pollNextVotes}% で「次の動画へ出航」が決定しました！面舵一杯！⛵️`, "CRUISE BOT", false);
+        appendChatMessage("⚓️ クルーズBOT", `得票率 ${pollNextVotes}% で「次のiLiFE!神曲へ出航」が決定しました！面舵一杯！⛵️`, "CRUISE BOT", false);
         playNextVideo();
     } else {
         appendChatMessage("⚓️ クルーズBOT", `得票率 ${pollStayVotes}% で「完奏」が決定しました！そのままお楽しみください🎵`, "CRUISE BOT", false);
@@ -351,7 +346,7 @@ function updateUIWithCurrentVideo() {
 
     document.getElementById('npTitle').textContent = video.title;
     document.getElementById('npArtist').textContent = video.artist;
-    document.getElementById('npTag').textContent = video.tag || "おすすめMV";
+    document.getElementById('npTag').textContent = video.tag || "神曲";
     document.getElementById('npDuration').textContent = video.duration || "--:--";
 
     document.getElementById('nextTitle').textContent = `${nextVideo.artist}「${nextVideo.title}」`;
@@ -406,7 +401,6 @@ function startProgressTimer() {
             const pct = (currentTime / duration) * 100;
             document.getElementById('progressBarFill').style.width = pct + '%';
 
-            // Trigger Cruise Voting Poll during final 35 seconds of video
             const remaining = duration - currentTime;
             if (remaining <= 35 && remaining > 5 && !isPollActive && isCruiseMode) {
                 triggerCruisePoll();
@@ -422,7 +416,7 @@ function formatSeconds(sec) {
 }
 
 // --- Realtime Simulated Chat & Screen Danmaku ---
-function appendChatMessage(user, text, badge = "乗組員", isMe = false) {
+function appendChatMessage(user, text, badge = "iLiFE!ファン", isMe = false) {
     const chatBox = document.getElementById('chatMessages');
     if (!chatBox) return;
 
@@ -524,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Force Sail Next Button
     document.getElementById('forceSailBtn').addEventListener('click', () => {
-        appendChatMessage("あなた (乗組員)", "面舵一杯！次の寄港地へ即時出航！ ⛵️", "乗組員", true);
+        appendChatMessage("あなた (乗組員)", "面舵一杯！次のiLiFE!神曲へ即時出航！ ⛵️", "iLiFE!ファン", true);
         playNextVideo();
     });
 
@@ -618,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if (text) {
-            appendChatMessage("あなた (乗組員)", text, "乗組員", true);
+            appendChatMessage("あなた (iLiFE!ファン)", text, "iLiFE!ファン", true);
             input.value = '';
         }
     });
@@ -654,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newVideo = {
                 id: videoId,
                 title: title || "ユーザー追加動画",
-                artist: artist || "Unknown Artist",
+                artist: artist || "iLiFE!",
                 tag: tag || "ユーザー追加",
                 duration: "03:30"
             };
@@ -662,12 +656,12 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPlaylistQueue();
             modal.classList.remove('show');
             document.getElementById('addVideoForm').reset();
-            alert(`「${newVideo.title}」をクルーズ巡回ルートに追加しました！`);
+            alert(`「${newVideo.title}」を巡回リストに追加しました！`);
         }
     });
 
-    appendChatMessage("みーちゃん推し", "アイドルクルーズ出航キター！！乗船します！⚓️", "乗組員", false);
-    appendChatMessage("サクラ坂ファン", "終盤のアンケートで次の動画決めるシステム面白すぎｗ", "VIP乗組員", false);
+    appendChatMessage("あいすちゃん推し", "iLiFE! 専門チャンネル最高すぎる！！！推し活捗る😭✨", "推し変不可", false);
+    appendChatMessage("iLiFE!ガチ勢", "可変三連MIX打つぞーー！タイガー！ファイヤー！", "現場組", false);
 
     if (window.lucide) lucide.createIcons();
     startSimulatedFanChat();
