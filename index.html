@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iLiFE! TV LIVE | 24時間アイライフ専門チャンネル & クルーズ</title>
-    <meta name="description" content="iLiFE!（アイライフ）やHEROINESのMV・ライブ映像を24時間連続再生！コールや弾幕コメントでお茶の間推し活を楽しめるファン専用サイト">
+    <title>IDOL TV LIVE | リアルタイム多人数同時視聴＆アンケート切替 MVP</title>
+    <meta name="description" content="全参加者がリアルタイムで同一秒数を同時視聴し、動画残り30秒のアンケート結果で最多得票曲へ自動遷移するWebSocketシステム">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,55 +20,32 @@
     <!-- Ambient Background Lighting -->
     <div class="ambient-glow"></div>
 
-    <!-- Screen Comments Overlay Container (Danmaku style toggleable) -->
-    <div id="screenCommentsOverlay" class="screen-comments-overlay"></div>
-
     <div class="tv-app-layout">
         <!-- Top Navigation Header -->
         <header class="tv-header">
             <div class="brand-zone">
                 <div class="live-indicator">
                     <span class="pulse-dot"></span>
-                    <span class="live-text">ON AIR</span>
+                    <span class="live-text">SYNC ON</span>
                 </div>
-                <h1 class="brand-title">iLiFE!<span class="highlight"> TV</span> LIVE</h1>
-                <span class="badge-hd">4K Ultra HD</span>
-                
-                <!-- Cruise Mode Active Badge -->
-                <div class="cruise-mode-badge" id="cruiseModeBadge">
-                    <i data-lucide="ship"></i> IDOL CRUISE 航海中
-                </div>
+                <h1 class="brand-title">IDOL<span class="highlight">TV</span> MVP</h1>
+                <span class="badge-hd">WebSocket Sync</span>
             </div>
 
-            <!-- Program Selector & Quick Switch -->
-            <div class="channel-picker">
-                <span class="picker-label"><i data-lucide="radio"></i> 選局:</span>
-                <button class="channel-btn active" data-channel="ilife">
-                    <i data-lucide="sparkles"></i> iLiFE! SP (アイライフ)
-                </button>
-                <button class="channel-btn" data-channel="heroines">
-                    <i data-lucide="flame"></i> ヒロインズ・ブレイクSP
-                </button>
-                <button class="channel-btn" data-channel="allstar">
-                    <i data-lucide="crown"></i> ALL STAR MV集
-                </button>
-            </div>
-
+            <!-- Sync & Online Viewers Status Badge -->
             <div class="header-right-actions">
-                <button id="toggleCruiseBtn" class="action-btn btn-cruise active" title="ニコ生クルーズ風の自動巡回・アンケート投票モード切替">
-                    <i data-lucide="ship"></i> クルーズモード: ON
-                </button>
-                <div class="tv-clock-badge">
-                    <i data-lucide="clock"></i>
-                    <span id="tvCurrentTime">00:00:00</span>
+                <div class="sync-status-badge">
+                    <i data-lucide="radio"></i>
+                    <span id="syncStatusText">Socket.io 同期中</span>
                 </div>
-                <button id="addVideoBtn" class="action-btn btn-secondary">
-                    <i data-lucide="plus-circle"></i> 動画追加
-                </button>
+                <div class="online-users-badge">
+                    <i data-lucide="users"></i>
+                    <span id="onlineViewersCount">1</span>人 が同時視聴中
+                </div>
             </div>
         </header>
 
-        <!-- Main Content Area: Left Video Screen + Right Interactive Panel -->
+        <!-- Main Content Area: Left Player & Right Poll/Candidate Panel -->
         <div class="tv-main-viewport">
             
             <!-- Video Broadcast Section -->
@@ -78,12 +55,12 @@
                 <div id="startOverlay" class="start-overlay">
                     <div class="start-card">
                         <div class="start-icon-wrap">
-                            <i data-lucide="heart"></i>
+                            <i data-lucide="play"></i>
                         </div>
-                        <h2>iLiFE! TV LIVE を視聴開始</h2>
-                        <p>『アイドルライフスターターパック』など人気楽曲を24時間連続再生！<br>みんなで可変三連MIXや弾幕コメントで盛り上がろう！</p>
+                        <h2>同時視聴に参加する</h2>
+                        <p>全員で同じ秒数を同時再生！<br>残り30秒のアンケート投票で次に流れる曲が決まります。</p>
                         <button id="startBroadcastBtn" class="btn-start-broadcast">
-                            <i data-lucide="play-circle"></i> iLiFE! 専門TVを視聴する (音声ON)
+                            <i data-lucide="play-circle"></i> 同時視聴を開始する (音声ON)
                         </button>
                     </div>
                 </div>
@@ -95,93 +72,35 @@
                     <!-- TV Overlays -->
                     <div class="tv-overlay-layer" id="tvOverlayLayer">
                         
-                        <!-- Top-Left TV Program Watermark Logo -->
+                        <!-- Top-Left Watermark Logo -->
                         <div class="overlay-watermark">
-                            <div class="wm-ch">Ch.04 • iLiFE! SPECIAL</div>
-                            <div class="wm-title">iLiFE! TV LIVE</div>
+                            <div class="wm-ch">Ch.04 • REALTIME SYNC</div>
+                            <div class="wm-title">IDOL TV LIVE</div>
                         </div>
 
-                        <!-- Top-Right Current Show Info Telop -->
+                        <!-- Top-Right Current Video Info -->
                         <div class="overlay-show-info">
-                            <span class="show-category-tag" id="overlayCategory">【iLiFE! 特番】</span>
-                            <span class="show-title-text" id="overlayProgramName">アイドルライフ 24h Special</span>
-                        </div>
-
-                        <!-- Cruise Voting Poll Overlay (Appears during last 35 seconds) -->
-                        <div id="cruisePollCard" class="cruise-poll-card hidden">
-                            <div class="poll-header">
-                                <div class="poll-badge"><i data-lucide="vote"></i> iLiFE! 乗組員アンケート</div>
-                                <div class="poll-timer">残り <span id="pollCountdown">20</span>秒</div>
-                            </div>
-                            <div class="poll-question">次のiLiFE!神曲へ出航しますか？</div>
-                            <div class="poll-options">
-                                <button id="voteNextBtn" class="poll-btn poll-btn-next">
-                                    <span class="poll-btn-label">1. 次の神曲へ出航！ ⛵️</span>
-                                    <span class="poll-pct" id="voteNextPct">68%</span>
-                                    <div class="poll-bar-fill" id="voteNextBar" style="width: 68%;"></div>
-                                </button>
-                                <button id="voteStayBtn" class="poll-btn poll-btn-stay">
-                                    <span class="poll-btn-label">2. この曲を最後まで聴く 🎵</span>
-                                    <span class="poll-pct" id="voteStayPct">32%</span>
-                                    <div class="poll-bar-fill" id="voteStayBar" style="width: 32%;"></div>
-                                </button>
-                            </div>
-                            <div class="poll-footer">
-                                <span id="pollVotersCount"><i data-lucide="users"></i> 1,420人が投票済み</span>
-                            </div>
+                            <span class="show-category-tag" id="overlayCategory">【リアルタイム同時視聴中】</span>
+                            <span class="show-title-text" id="overlayProgramName">2026 iLiFE! & Idol Special</span>
                         </div>
 
                         <!-- Lower-Left Now Playing Banner -->
                         <div class="overlay-now-playing" id="nowPlayingBanner">
-                            <div class="np-label"><i data-lucide="music"></i> NOW PLAYING (iLiFE!)</div>
+                            <div class="np-label"><i data-lucide="music"></i> NOW PLAYING (全端末同期中)</div>
                             <div class="np-title" id="npTitle">曲名を読み込み中...</div>
-                            <div class="np-artist" id="npArtist">iLiFE!</div>
+                            <div class="np-artist" id="npArtist">アーティスト名</div>
                             <div class="np-meta">
-                                <span class="np-tag" id="npTag">神曲</span>
+                                <span class="np-tag" id="npTag">全参加者同期</span>
                                 <span class="np-time" id="npDuration">--:--</span>
                             </div>
                         </div>
 
-                        <!-- Lower-Right Next Up Preview Banner -->
-                        <div class="overlay-next-preview" id="nextPreviewBanner">
-                            <div class="next-label">NEXT DESTINATION</div>
-                            <div class="next-title" id="nextTitle">次の動画</div>
-                        </div>
-
-                        <!-- Screen Telop Comment Overlay Switch -->
-                        <div class="overlay-controls">
-                            <button id="toggleDanmakuBtn" class="icon-toggle-btn active" title="画面上にニコニコ風流しコメントを表示">
-                                <i data-lucide="message-square"></i> 画面テロップ: ON
-                            </button>
-                            <button id="toggleOverlaysBtn" class="icon-toggle-btn active" title="テレビ風テロップ全体の表示切り替え">
-                                <i data-lucide="tv-2"></i> TVオーバーレイ: ON
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Broadcast Ticker / News Bar -->
-                <div class="broadcast-ticker">
-                    <div class="ticker-badge">iLiFE!速報</div>
-                    <div class="ticker-content-wrapper">
-                        <div class="ticker-content" id="tickerText">
-                            ♪ ただいま「iLiFE! 専門チャンネル」を全人類同時放送中！ 『アイドルライフスターターパック』『初恋リバイバル』など神曲連続オンエア中！
-                        </div>
                     </div>
                 </div>
 
                 <!-- Bottom Control Strip -->
                 <div class="tv-control-strip">
                     <div class="control-group">
-                        <button id="prevBtn" class="ctrl-btn" title="前の曲へ">
-                            <i data-lucide="skip-back"></i>
-                        </button>
-                        <button id="playPauseBtn" class="ctrl-btn main-ctrl" title="再生 / 一時停止">
-                            <i data-lucide="pause"></i>
-                        </button>
-                        <button id="nextBtn" class="ctrl-btn" title="次の曲へ出航">
-                            <i data-lucide="skip-forward"></i>
-                        </button>
                         <div class="volume-control">
                             <button id="muteBtn" class="ctrl-btn-sm"><i data-lucide="volume-2"></i></button>
                             <input type="range" id="volumeSlider" min="0" max="100" value="80" class="vol-range">
@@ -197,99 +116,57 @@
                     </div>
 
                     <div class="control-group">
-                        <button id="forceSailBtn" class="sync-now-btn" title="今すぐ次のiLiFE!神曲へ出航する">
-                            <i data-lucide="navigation"></i> 次の神曲へ即時出航 ⛵️
-                        </button>
+                        <div class="remaining-badge">
+                            <i data-lucide="clock"></i> 残り <span id="remainingTimeText">--:--</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Sidebar: Tabs for Chat & Timetable / Playlist -->
+            <!-- Sidebar: Realtime Candidate Poll & Live Voting Panel -->
             <aside class="tv-sidebar">
                 
-                <!-- Sidebar Tabs Navigation -->
-                <div class="sidebar-tabs">
-                    <button class="tab-btn active" data-tab="chat">
-                        <i data-lucide="messages-square"></i> iLiFE! ファンチャット
-                        <span class="chat-online-count" id="onlineCount"><i data-lucide="users"></i> 1,420人</span>
-                    </button>
-                    <button class="tab-btn" data-tab="timetable">
-                        <i data-lucide="list-music"></i> 巡回曲リスト
-                    </button>
+                <!-- Sidebar Header -->
+                <div class="sidebar-header">
+                    <h2><i data-lucide="vote"></i> 次の曲 アンケート</h2>
+                    <span class="poll-status-indicator idle" id="pollStatusIndicator">待機中 (残り30秒で開始)</span>
                 </div>
 
-                <!-- Tab 1: Live Viewer Chat -->
-                <div class="tab-content active" id="tabChat">
-                    <div class="chat-messages-container" id="chatMessages">
-                        <!-- Simulated Fan Messages loaded dynamically -->
+                <!-- Active Poll Container -->
+                <div class="poll-panel-body" id="pollPanelBody">
+                    
+                    <!-- Idle State Message (when remaining > 30s) -->
+                    <div id="pollIdleBox" class="poll-idle-box">
+                        <div class="idle-icon-wrap">
+                            <i data-lucide="hourglass"></i>
+                        </div>
+                        <h3>アンケート待機中</h3>
+                        <p>動画の残り時間が <strong>30秒</strong> になると、候補曲（3〜4択）のアンケート投票が始まります。</p>
                     </div>
 
-                    <!-- Chat Input Box -->
-                    <form id="chatForm" class="chat-input-form">
-                        <input type="text" id="chatInput" placeholder="コールや弾幕コメントで盛り上がろう！" maxlength="80" autocomplete="off" required>
-                        <button type="submit" class="chat-send-btn">
-                            <i data-lucide="send"></i>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Tab 2: Timetable & Playlist -->
-                <div class="tab-content" id="tabTimetable">
-                    <!-- Current Program Schedule Banner -->
-                    <div class="timetable-header-card">
-                        <div class="th-title"><i data-lucide="heart"></i> iLiFE! 巡回プレイリスト</div>
-                        <div class="th-desc">アンケート結果に基づいてiLiFE!の神曲を自動巡回します</div>
+                    <!-- Active Candidates Poll List (when remaining <= 30s) -->
+                    <div id="pollActiveBox" class="poll-active-box hidden">
+                        <div class="poll-timer-card">
+                            <div class="pt-label"><i data-lucide="timer"></i> 集計締め切りまで</div>
+                            <div class="pt-countdown" id="pollCountdownSec">30秒</div>
+                        </div>
+                        <p class="poll-instruction">投票数が多い曲に全端末が一斉切り替わります！</p>
+                        
+                        <!-- Dynamic Candidates Choices Container -->
+                        <div class="candidate-choices-list" id="candidateChoicesList">
+                            <!-- Populated dynamically by client.js -->
+                        </div>
                     </div>
 
-                    <!-- Video Queue List -->
-                    <div class="playlist-queue" id="playlistQueue">
-                        <!-- Dynamically populated queue items -->
-                    </div>
                 </div>
 
             </aside>
         </div>
     </div>
 
-    <!-- Modal for Adding Custom YouTube Video -->
-    <div id="addVideoModal" class="modal-backdrop">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3><i data-lucide="plus-circle"></i> iLiFE! 動画を追加</h3>
-                <button id="closeModalBtn" class="modal-close"><i data-lucide="x"></i></button>
-            </div>
-            <form id="addVideoForm" class="modal-body">
-                <div class="form-group">
-                    <label for="videoUrlInput">YouTube 動画URL または 動画ID</label>
-                    <input type="text" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=..." required>
-                </div>
-                <div class="form-group">
-                    <label for="videoTitleInput">曲名 / タイトル</label>
-                    <input type="text" id="videoTitleInput" placeholder="例: アイドルライフスターターパック" required>
-                </div>
-                <div class="form-group">
-                    <label for="videoArtistInput">アーティスト名 / グループ名</label>
-                    <input type="text" id="videoArtistInput" value="iLiFE!" required>
-                </div>
-                <div class="form-group">
-                    <label for="videoTagInput">タグ / カテゴリ</label>
-                    <select id="videoTagInput">
-                        <option value="神曲" selected>神曲</option>
-                        <option value="MV">MV</option>
-                        <option value="ライブ映像">ライブ映像</option>
-                        <option value="コール動画">コール動画</option>
-                    </select>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" id="cancelAddBtn" class="btn-secondary">キャンセル</button>
-                    <button type="submit" class="btn-primary">プレイリストに追加</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Load YouTube IFrame Player API -->
+    <!-- Socket.io Client Library & Main Client JS -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="script.js?v=20260824_ilife_v3"></script>
+    <script src="client.js"></script>
 </body>
 </html>
