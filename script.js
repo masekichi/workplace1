@@ -92,7 +92,7 @@ function getGlobalSyncPosition() {
 
     if (totalDuration === 0) return { index: 0, seek: 0 };
 
-    const MASTER_EPOCH_SEC = 1767225600;
+    const MASTER_EPOCH_SEC = 0;
     const currentUnixSec = Math.floor(Date.now() / 1000);
     const elapsed = Math.max(0, currentUnixSec - MASTER_EPOCH_SEC);
     const cycleOffset = elapsed % totalDuration;
