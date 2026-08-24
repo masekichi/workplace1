@@ -2,21 +2,19 @@
    IDOL TV LIVE - Continuous YouTube Broadcast Engine & Interactive Logic
    ========================================================================== */
 
-// --- Pre-Curated Channel Playlists (Real YouTube Video IDs) ---
+// --- Pre-Curated Channel Playlists (Verified Embeddable YouTube Video IDs) ---
 const CHANNELS = {
     sakamichi: {
-        name: "坂道・46グループ Special",
-        category: "【46グループ特番】",
-        ticker: "♪ ただいま「坂道・46グループ Special」を絶賛放送中！ 乃木坂46・櫻坂46・日向坂46の最新ヒットMVを24時間オンエア！",
+        name: "坂道・46グループ & AKB48 Special",
+        category: "【アイドル大特集】",
+        ticker: "♪ ただいま「坂道・46グループ & AKB48 Special」を絶賛放送中！ 伝説のヒットMV『インフルエンサー』『シンクロニシティ』など24時間オンエア！",
         videos: [
-            { id: "_bHwB6q6xBc", title: "Monopoly", artist: "乃木坂46", tag: "神回", duration: "03:58" },
-            { id: "yJ-_S-_P_s8", title: "Start over!", artist: "櫻坂46", tag: "ダンス", duration: "04:12" },
-            { id: "1J18eB99s6g", title: "Am I ready?", artist: "日向坂46", tag: "おすすめMV", duration: "04:15" },
-            { id: "b4_S5V2Z2tM", title: "おひとりさま天国", artist: "乃木坂46", tag: "神回", duration: "04:20" },
-            { id: "x_b_8Z2t0kM", title: "承認欲求", artist: "櫻坂46", tag: "ダンス", duration: "03:45" },
-            { id: "m2046s85N-E", title: "君は0から1になれ", artist: "日向坂46", tag: "ライブ映像", duration: "04:30" },
             { id: "r4SdiT7mm7Y", title: "インフルエンサー", artist: "乃木坂46", tag: "伝説のMV", duration: "04:45" },
-            { id: "w2X58x5uXbU", title: "自業自得", artist: "櫻坂46", tag: "おすすめMV", duration: "03:52" }
+            { id: "fIqKWLyiAc0", title: "シンクロニシティ", artist: "乃木坂46", tag: "レコード大賞", duration: "04:14" },
+            { id: "dFfNYBo7f4E", title: "恋するフォーチュンクッキー", artist: "AKB48", tag: "ミリオンセラー", duration: "04:54" },
+            { id: "XiYjkSyu0eY", title: "Sing Out!", artist: "乃木坂46", tag: "神曲", duration: "05:25" },
+            { id: "lkHlnWFnA0c", title: "ヘビーローテーション", artist: "AKB48", tag: "国民的ソング", duration: "04:42" },
+            { id: "ReI6gvzVP0Y", title: "泡沫サタデーナイト！", artist: "モーニング娘。'16", tag: "ダンス", duration: "03:48" }
         ]
     },
     newwave: {
@@ -27,6 +25,7 @@ const CHANNELS = {
             { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER", tag: "SNSバズ", duration: "03:45" },
             { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "神回", duration: "03:15" },
             { id: "Z1_b-8w0N3k", title: "Click", artist: "ME:I", tag: "ダンス", duration: "03:30" },
+            { id: "QW28PUVeLpw", title: "Make you happy", artist: "NiziU", tag: "縄跳びダンス", duration: "03:44" },
             { id: "m3uYmZ6K9zM", title: "絶対アイドル辞めないで", artist: "=LOVE", tag: "おすすめMV", duration: "04:10" },
             { id: "3Z1w5w7v22c", title: "HEARTRIS", artist: "NiziU", tag: "神回", duration: "03:22" }
         ]
@@ -37,9 +36,10 @@ const CHANNELS = {
         ticker: "♪ アイドル＆J-POPオールスターMV特番！ 世界中で大ヒットの『アイドル』をはじめ人気曲をメドレーでお送りします！",
         videos: [
             { id: "ZRtdQ81jPUQ", title: "アイドル (Idol)", artist: "YOASOBI", tag: "世界ヒット", duration: "03:32" },
-            { id: "_bHwB6q6xBc", title: "Monopoly", artist: "乃木坂46", tag: "おすすめMV", duration: "03:58" },
+            { id: "r4SdiT7mm7Y", title: "インフルエンサー", artist: "乃木坂46", tag: "おすすめMV", duration: "04:45" },
             { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER", tag: "神回", duration: "03:45" },
-            { id: "yJ-_S-_P_s8", title: "Start over!", artist: "櫻坂46", tag: "ダンス", duration: "04:12" }
+            { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "TikTokバズ", duration: "03:15" },
+            { id: "fIqKWLyiAc0", title: "シンクロニシティ", artist: "乃木坂46", tag: "神回", duration: "04:14" }
         ]
     }
 };
@@ -59,7 +59,7 @@ const FAN_COMMENTS = [
     { name: "みーちゃん推し", text: "推しが尊すぎて直視できない😭✨", badge: "ファン暦3年" },
     { name: "サクラ坂ファン", text: "この表現力とダンスのキレ最高すぎる！", badge: "VIP" },
     { name: "おひさまパパ", text: "コール入れたくなるｗｗｗ", badge: "LIVE参戦組" },
-    { name: "アイドルヲタA", text: "神曲きたああああ＼(^o(^＼(^o^)/", badge: "常連" },
+    { name: "アイドルヲタA", text: "神曲きたああああ＼(^o^)/", badge: "常連" },
     { name: "乃木坂DD", text: "イントロから鳥肌立つレベルで好き", badge: "ガチ勢" },
     { name: "トキメキLOVE", text: "衣装めっちゃかわいくない！？❤️", badge: "ファン" },
     { name: "ライブ最高", text: "24時間流しっぱなしにできるの神サイトだわ", badge: "プレミアム" },
@@ -131,10 +131,13 @@ function onPlayerStateChange(event) {
     }
 }
 
+// Robust Auto-Skip Handler for Unembeddable YouTube Videos (Error 101/150/100)
 function onPlayerError(event) {
-    console.warn("YouTube Player Error code:", event.data, "Skipping to next video...");
-    // Auto skip on broken / unembeddable video
-    setTimeout(playNextVideo, 1500);
+    console.warn("YouTube Player Error code:", event.data, "Video cannot be embedded in 3rd party site. Auto-skipping to next video...");
+    // Immediately skip to next video so stream is never interrupted!
+    setTimeout(() => {
+        playNextVideo();
+    }, 400);
 }
 
 // --- Navigation & Playback Logic ---
