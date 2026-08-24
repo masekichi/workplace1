@@ -59,7 +59,7 @@ const FAN_COMMENTS = [
     { name: "みーちゃん推し", text: "推しが尊すぎて直視できない😭✨", badge: "ファン暦3年" },
     { name: "サクラ坂ファン", text: "この表現力とダンスのキレ最高すぎる！", badge: "VIP" },
     { name: "おひさまパパ", text: "コール入れたくなるｗｗｗ", badge: "LIVE参戦組" },
-    { name: "アイドルヲタA", text: "神曲きたああああ＼(^o^)／", badge: "常連" },
+    { name: "アイドルヲタA", text: "神曲きたああああ＼(^o(^＼(^o^)/", badge: "常連" },
     { name: "乃木坂DD", text: "イントロから鳥肌立つレベルで好き", badge: "ガチ勢" },
     { name: "トキメキLOVE", text: "衣装めっちゃかわいくない！？❤️", badge: "ファン" },
     { name: "ライブ最高", text: "24時間流しっぱなしにできるの神サイトだわ", badge: "プレミアム" },
@@ -67,12 +67,20 @@ const FAN_COMMENTS = [
 ];
 
 // --- YouTube IFrame API Lifecycle ---
-function onYouTubeIframeAPIReady() {
-    console.log("YouTube IFrame API Ready");
+window.onYouTubeIframeAPIReady = function() {
+    console.log("YouTube IFrame API Ready triggered");
     initPlayer();
+};
+
+function checkAndInitPlayer() {
+    if (window.YT && window.YT.Player && !player) {
+        console.log("YT Player API already available, initializing immediately");
+        initPlayer();
+    }
 }
 
 function initPlayer() {
+    if (player) return;
     const initialVideo = CHANNELS[currentChannelKey].videos[currentVideoIndex];
     player = new YT.Player('player', {
         height: '100%',
@@ -84,7 +92,7 @@ function initPlayer() {
             'rel': 0,
             'modestbranding': 1,
             'enablejsapi': 1,
-            'origin': window.location.origin,
+            'playsinline': 1,
             'fs': 1
         },
         events: {
@@ -100,6 +108,13 @@ function onPlayerReady(event) {
     console.log("Player is Ready");
     updateUIWithCurrentVideo();
     startProgressTimer();
+
+    // Check if user already clicked start broadcast overlay
+    const overlay = document.getElementById('startOverlay');
+    if (overlay && overlay.classList.contains('hidden')) {
+        player.unMute();
+        player.playVideo();
+    }
 }
 
 // Key Event: Continuous Auto-Playback Hook
@@ -291,14 +306,15 @@ function spawnDanmakuText(text, isMe = false) {
 
 function startSimulatedFanChat() {
     setInterval(() => {
-        // 40% chance every 4 seconds to spawn a fan comment
+        // 45% chance every 4 seconds to spawn a fan comment
         if (Math.random() < 0.45) {
             const randomFan = FAN_COMMENTS[Math.floor(Math.random() * FAN_COMMENTS.length)];
             appendChatMessage(randomFan.name, randomFan.text, randomFan.badge, false);
             
             // Fluctuate viewer count slightly for realism
             onlineViewers += Math.floor(Math.random() * 7) - 3;
-            document.getElementById('onlineCount').innerHTML = `<i data-lucide="users"></i> ${onlineViewers.toLocaleString()}人`;
+            const onlineEl = document.getElementById('onlineCount');
+            if (onlineEl) onlineEl.innerHTML = `<i data-lucide="users"></i> ${onlineViewers.toLocaleString()}人`;
             if (window.lucide) lucide.createIcons();
         }
     }, 4000);
@@ -313,6 +329,9 @@ function escapeHTML(str) {
 // --- Event Listeners Setup ---
 document.addEventListener('DOMContentLoaded', () => {
     
+    // Check if YT API is already loaded by race condition
+    checkAndInitPlayer();
+
     // Live Digital Clock Tick
     setInterval(() => {
         const now = new Date();
@@ -324,6 +343,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start Overlay Autoplay Trigger Button
     document.getElementById('startBroadcastBtn').addEventListener('click', () => {
         document.getElementById('startOverlay').classList.add('hidden');
+        if (!player) {
+            checkAndInitPlayer();
+        }
         if (isPlayerReady && player) {
             player.unMute();
             player.playVideo();
