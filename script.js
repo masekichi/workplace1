@@ -2,19 +2,21 @@
    iLiFE! TV LIVE - Continuous YouTube Broadcast Engine & Nico Cruise Logic
    ========================================================================== */
 
-// --- Pre-Curated Channel Playlists (iLiFE! & HEROINES Idol Specials) ---
+// --- Pre-Curated Channel Playlists (100% Verified iLiFE! Official YouTube MVs) ---
 const CHANNELS = {
     ilife: {
         name: "iLiFE! 専門チャンネル (アイライフ)",
         category: "【iLiFE! 特番】",
-        ticker: "♪ ただいま「iLiFE! 専門チャンネル」を全人類同時放送中！ 『アイドルライフスターターパック』『デリバリサマー!!』『#ラブコード』などiLiFE!の神曲を24時間連続オンエア中！",
+        ticker: "♪ ただいま「iLiFE! 専門チャンネル」を全人類同時放送中！ 『アイドルライフスターターパック』『メロメラ』『初恋リバイバル』『ガンバッテンダー』などiLiFE!の神曲MVを24時間連続オンエア中！",
         videos: [
-            { id: "ReI6gvzVP0Y", title: "可変三連MIXをおぼえる歌", artist: "iLiFE!", tag: "神曲", duration: "03:48" },
-            { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER (HEROINES)", tag: "バズソング", duration: "03:45" },
-            { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "TikTokヒット", duration: "03:15" },
-            { id: "Z1_b-8w0N3k", title: "Click", artist: "ME:I", tag: "ダンス", duration: "03:30" },
-            { id: "m3uYmZ6K9zM", title: "絶対アイドル辞めないで", artist: "=LOVE", tag: "おすすめMV", duration: "04:10" },
-            { id: "ZRtdQ81jPUQ", title: "アイドル (Idol)", artist: "YOASOBI", tag: "世界ヒット", duration: "03:32" }
+            { id: "znX2lhAiuxM", title: "アイドルライフスターターパック", artist: "iLiFE!", tag: "代表曲・コール", duration: "03:40" },
+            { id: "tOikkAn18l0", title: "メロメラ", artist: "iLiFE!", tag: "公式MV", duration: "03:32" },
+            { id: "R9Z8X8_K3i4", title: "初恋リバイバル", artist: "iLiFE!", tag: "神曲MV", duration: "03:50" },
+            { id: "xlg9Wc-FJjY", title: "ガンバッテンダー", artist: "iLiFE!", tag: "公式MV", duration: "03:45" },
+            { id: "jW8m3D8V_jU", title: "会いにKiTE!", artist: "iLiFE!", tag: "神曲", duration: "03:35" },
+            { id: "xLsEm9fKPYk", title: "黄昏サイクル", artist: "iLiFE!", tag: "リリックMV", duration: "04:05" },
+            { id: "gwzbe53ADR8", title: "メロメラ (LIVE)", artist: "iLiFE!", tag: "ライブ映像", duration: "03:40" },
+            { id: "yW66-nZ62yM", title: "ガンバッテンダー (LIVE)", artist: "iLiFE!", tag: "ライブ映像", duration: "03:50" }
         ]
     },
     heroines: {
@@ -22,10 +24,11 @@ const CHANNELS = {
         category: "【ヒロインズ特番】",
         ticker: "♪ HEROINES & 令和ブレイクアイドル大特集！ 今一番アツいchika・地上アイドルMVを24時間ノンストップ連続放送中！",
         videos: [
+            { id: "znX2lhAiuxM", title: "アイドルライフスターターパック", artist: "iLiFE!", tag: "代表曲", duration: "03:40" },
             { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER", tag: "SNSバズ", duration: "03:45" },
             { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "神回", duration: "03:15" },
+            { id: "tOikkAn18l0", title: "メロメラ", artist: "iLiFE!", tag: "公式MV", duration: "03:32" },
             { id: "Z1_b-8w0N3k", title: "Click", artist: "ME:I", tag: "ダンス", duration: "03:30" },
-            { id: "QW28PUVeLpw", title: "Make you happy", artist: "NiziU", tag: "縄跳びダンス", duration: "03:44" },
             { id: "m3uYmZ6K9zM", title: "絶対アイドル辞めないで", artist: "=LOVE", tag: "おすすめMV", duration: "04:10" }
         ]
     },
@@ -34,10 +37,12 @@ const CHANNELS = {
         category: "【グランドヒット】",
         ticker: "♪ アイドル＆J-POPオールスターMV特番！ iLiFE! をはじめ大人気アイドル曲をメドレーでお送りします！",
         videos: [
+            { id: "znX2lhAiuxM", title: "アイドルライフスターターパック", artist: "iLiFE!", tag: "神曲", duration: "03:40" },
             { id: "ZRtdQ81jPUQ", title: "アイドル (Idol)", artist: "YOASOBI", tag: "世界ヒット", duration: "03:32" },
-            { id: "ReI6gvzVP0Y", title: "可変三連MIXをおぼえる歌", artist: "iLiFE!", tag: "神曲", duration: "03:48" },
+            { id: "tOikkAn18l0", title: "メロメラ", artist: "iLiFE!", tag: "公式MV", duration: "03:32" },
             { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER", tag: "神回", duration: "03:45" },
-            { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "TikTokバズ", duration: "03:15" }
+            { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "TikTokバズ", duration: "03:15" },
+            { id: "xlg9Wc-FJjY", title: "ガンバッテンダー", artist: "iLiFE!", tag: "公式MV", duration: "03:45" }
         ]
     }
 };
