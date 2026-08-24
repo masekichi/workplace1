@@ -3,184 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Today's Date | 本日の日付 & リアルタイムクロック</title>
-    <meta name="description" content="今日の日付、和暦（令和）、時間、カレンダー、世界の時間を一元表示するプレミアム・デイト＆タイムダッシュボード">
+    <title>IDOL TV LIVE | 24時間アイドル専門チャンネル</title>
+    <meta name="description" content="好きなアイドルのMVやライブ映像をテレビ番組のように24時間連続再生！リアルタイムチャットでお茶の間感を楽しめるファン専用キュレーションメディア">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+JP:wght@400;500;700;900&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- Ambient Background Animation -->
-    <div class="ambient-background">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="grid-overlay"></div>
-    </div>
+<body class="tv-theme-dark">
+    <!-- Ambient Background Lighting -->
+    <div class="ambient-glow"></div>
 
-    <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="logo">
-                <i data-lucide="calendar-heart" class="logo-icon"></i>
-                <span>Chronos Today</span>
+    <!-- Screen Comments Overlay Container (Danmaku style toggleable) -->
+    <div id="screenCommentsOverlay" class="screen-comments-overlay"></div>
+
+    <div class="tv-app-layout">
+        <!-- Top Navigation Header -->
+        <header class="tv-header">
+            <div class="brand-zone">
+                <div class="live-indicator">
+                    <span class="pulse-dot"></span>
+                    <span class="live-text">ON AIR</span>
+                </div>
+                <h1 class="brand-title">IDOL<span class="highlight">CHANNEL</span> TV</h1>
+                <span class="badge-hd">4K Ultra HD</span>
             </div>
-            <div class="header-actions">
-                <button id="themeToggleBtn" class="icon-btn" title="テーマ切り替え">
-                    <i data-lucide="sun" id="themeIcon"></i>
+
+            <!-- Program Selector & Quick Switch -->
+            <div class="channel-picker">
+                <span class="picker-label"><i data-lucide="radio"></i> チャンネル選局:</span>
+                <button class="channel-btn active" data-channel="sakamichi">
+                    <i data-lucide="sparkles"></i> 坂道・46 SP
+                </button>
+                <button class="channel-btn" data-channel="newwave">
+                    <i data-lucide="flame"></i> 令和ブレイクアイドル
+                </button>
+                <button class="channel-btn" data-channel="allstar">
+                    <i data-lucide="crown"></i> ALL STAR MV集
+                </button>
+            </div>
+
+            <div class="header-right-actions">
+                <div class="tv-clock-badge">
+                    <i data-lucide="clock"></i>
+                    <span id="tvCurrentTime">00:00:00</span>
+                </div>
+                <button id="addVideoBtn" class="action-btn btn-secondary">
+                    <i data-lucide="plus-circle"></i> 動画追加
                 </button>
             </div>
         </header>
 
-        <!-- Main Grid -->
-        <main class="main-content">
-            <!-- Main Hero Card: Date & Time Display -->
-            <section class="card hero-card">
-                <div class="hero-header">
-                    <div class="badge-group">
-                        <span class="badge" id="eraBadge">令和 8年</span>
-                        <span class="badge badge-accent" id="dayOfYearBadge">2026年 第--日目</span>
-                        <span class="badge badge-outline" id="weekNumberBadge">第--週</span>
+        <!-- Main Content Area: Left Video Screen + Right Interactive Panel -->
+        <div class="tv-main-viewport">
+            
+            <!-- Video Broadcast Section -->
+            <section class="video-screen-container">
+                
+                <!-- Initial Start Broadcast Overlay (Satisfying Browser Autoplay Rule) -->
+                <div id="startOverlay" class="start-overlay">
+                    <div class="start-card">
+                        <div class="start-icon-wrap">
+                            <i data-lucide="tv"></i>
+                        </div>
+                        <h2>IDOL CHANNEL TV を視聴開始</h2>
+                        <p>音声付きで24時間自動連続再生を開始します。<br>お茶の間気分で推し活をお楽しみください。</p>
+                        <button id="startBroadcastBtn" class="btn-start-broadcast">
+                            <i data-lucide="play-circle"></i> 番組を視聴する (音声ON)
+                        </button>
                     </div>
-                    <button id="copyDateBtn" class="copy-btn" title="日付をクリップボードにコピー">
-                        <i data-lucide="copy"></i>
-                        <span>コピー</span>
+                </div>
+
+                <!-- Video Frame Wrapper -->
+                <div class="video-player-wrapper">
+                    <div id="player"></div>
+                    
+                    <!-- TV Overlays -->
+                    <div class="tv-overlay-layer" id="tvOverlayLayer">
+                        
+                        <!-- Top-Left TV Program Watermark Logo -->
+                        <div class="overlay-watermark">
+                            <div class="wm-ch">Ch.04</div>
+                            <div class="wm-title">IDOL TV LIVE</div>
+                        </div>
+
+                        <!-- Top-Right Current Show Info Telop -->
+                        <div class="overlay-show-info">
+                            <span class="show-category-tag" id="overlayCategory">【特番】</span>
+                            <span class="show-title-text" id="overlayProgramName">2026年 Hit MV 24h Special</span>
+                        </div>
+
+                        <!-- Lower-Left Now Playing Banner -->
+                        <div class="overlay-now-playing" id="nowPlayingBanner">
+                            <div class="np-label"><i data-lucide="music"></i> NOW PLAYING</div>
+                            <div class="np-title" id="npTitle">曲名を読み込み中...</div>
+                            <div class="np-artist" id="npArtist">アーティスト名</div>
+                            <div class="np-meta">
+                                <span class="np-tag" id="npTag">おすすめMV</span>
+                                <span class="np-time" id="npDuration">--:--</span>
+                            </div>
+                        </div>
+
+                        <!-- Lower-Right Next Up Preview Banner -->
+                        <div class="overlay-next-preview" id="nextPreviewBanner">
+                            <div class="next-label">NEXT 予告</div>
+                            <div class="next-title" id="nextTitle">次の動画</div>
+                        </div>
+
+                        <!-- Screen Telop Comment Overlay Switch -->
+                        <div class="overlay-controls">
+                            <button id="toggleDanmakuBtn" class="icon-toggle-btn active" title="画面上にニコニコ風流しコメントを表示">
+                                <i data-lucide="message-square"></i> 画面テロップ: ON
+                            </button>
+                            <button id="toggleOverlaysBtn" class="icon-toggle-btn active" title="テレビ風テロップ全体の表示切り替え">
+                                <i data-lucide="tv-2"></i> TVオーバーレイ: ON
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Broadcast Ticker / News Bar -->
+                <div class="broadcast-ticker">
+                    <div class="ticker-badge">速報NEWS</div>
+                    <div class="ticker-content-wrapper">
+                        <div class="ticker-content" id="tickerText">
+                            ♪ ただいま「坂道・46グループ Special」を放送中！ ── 次回の特集「令和ブレイクアイドル大集合」は23:00から放送予定！ ── リクエストや感想は右側のリアルタイムチャットから投稿できます！
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Control Strip -->
+                <div class="tv-control-strip">
+                    <div class="control-group">
+                        <button id="prevBtn" class="ctrl-btn" title="前の曲へ">
+                            <i data-lucide="skip-back"></i>
+                        </button>
+                        <button id="playPauseBtn" class="ctrl-btn main-ctrl" title="再生 / 一時停止">
+                            <i data-lucide="pause"></i>
+                        </button>
+                        <button id="nextBtn" class="ctrl-btn" title="次の曲へ">
+                            <i data-lucide="skip-forward"></i>
+                        </button>
+                        <div class="volume-control">
+                            <button id="muteBtn" class="ctrl-btn-sm"><i data-lucide="volume-2"></i></button>
+                            <input type="range" id="volumeSlider" min="0" max="100" value="80" class="vol-range">
+                        </div>
+                    </div>
+
+                    <div class="playback-progress-info">
+                        <span id="currentTimeDisplay">00:00</span>
+                        <div class="progress-bar-container" id="progressBarContainer">
+                            <div class="progress-bar-fill" id="progressBarFill"></div>
+                        </div>
+                        <span id="totalTimeDisplay">00:00</span>
+                    </div>
+
+                    <div class="control-group">
+                        <span class="auto-play-badge"><i data-lucide="repeat"></i> 自動連続再生 ON</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sidebar: Tabs for Chat & Timetable / Playlist -->
+            <aside class="tv-sidebar">
+                
+                <!-- Sidebar Tabs Navigation -->
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" data-tab="chat">
+                        <i data-lucide="messages-square"></i> お茶の間チャット
+                        <span class="chat-online-count" id="onlineCount"><i data-lucide="users"></i> 1,248人</span>
+                    </button>
+                    <button class="tab-btn" data-tab="timetable">
+                        <i data-lucide="calendar-range"></i> 番組表 / プレイリスト
                     </button>
                 </div>
 
-                <div class="date-display">
-                    <div class="main-date" id="mainDate">2026年8月10日</div>
-                    <div class="main-day" id="mainDay">月曜日 <span class="en-day" id="enDay">Monday</span></div>
+                <!-- Tab 1: Live Viewer Chat -->
+                <div class="tab-content active" id="tabChat">
+                    <div class="chat-messages-container" id="chatMessages">
+                        <!-- Simulated Fan Messages loaded dynamically -->
+                    </div>
+
+                    <!-- Chat Input Box -->
+                    <form id="chatForm" class="chat-input-form">
+                        <input type="text" id="chatInput" placeholder="みんなとコメントで盛り上がろう！" maxlength="80" autocomplete="off" required>
+                        <button type="submit" class="chat-send-btn">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </form>
                 </div>
 
-                <div class="time-display-container">
-                    <div class="time-display" id="timeDisplay">
-                        <span id="hours">12</span>:<span id="minutes">50</span>:<span id="seconds">00</span>
-                        <span id="ampm" class="ampm">AM</span>
+                <!-- Tab 2: Timetable & Playlist -->
+                <div class="tab-content" id="tabTimetable">
+                    <!-- Current Program Schedule Banner -->
+                    <div class="timetable-header-card">
+                        <div class="th-title"><i data-lucide="clock-3"></i> 本日のタイムテーブル</div>
+                        <div class="th-desc">時間帯に合わせてテーマ別プレイリストが自動放送されます</div>
+                    </div>
+
+                    <!-- Video Queue List -->
+                    <div class="playlist-queue" id="playlistQueue">
+                        <!-- Dynamically populated queue items -->
                     </div>
                 </div>
 
-                <!-- Controls Toolbar -->
-                <div class="toolbar">
-                    <div class="toggle-group">
-                        <label class="toggle-label">フォーマット:</label>
-                        <button class="segmented-btn active" data-format="ja">日本語</button>
-                        <button class="segmented-btn" data-format="en">English</button>
-                        <button class="segmented-btn" data-format="iso">ISO 8601</button>
-                    </div>
+            </aside>
+        </div>
+    </div>
 
-                    <div class="toggle-group">
-                        <label class="toggle-label">時間形式:</label>
-                        <button class="segmented-btn active" id="toggle24h">24時間</button>
-                        <button class="segmented-btn" id="toggle12h">12時間</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Side Column: Calendar & Stats -->
-            <div class="side-column">
-                <!-- Mini Calendar Card -->
-                <section class="card calendar-card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i data-lucide="calendar"></i>
-                            <span id="calendarMonthYear">2026年 8月</span>
-                        </div>
-                        <div class="calendar-nav">
-                            <button id="prevMonthBtn" class="mini-btn"><i data-lucide="chevron-left"></i></button>
-                            <button id="todayBtn" class="today-tag">今日</button>
-                            <button id="nextMonthBtn" class="mini-btn"><i data-lucide="chevron-right"></i></button>
-                        </div>
-                    </div>
-                    <div class="calendar-grid-header">
-                        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
-                    </div>
-                    <div class="calendar-days" id="calendarDays">
-                        <!-- JS populated -->
-                    </div>
-                </section>
-
-                <!-- Year Progress Card -->
-                <section class="card progress-card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i data-lucide="hourglass"></i>
-                            <span>今年の経過率</span>
-                        </div>
-                        <span class="progress-percent" id="yearProgressPercent">60.8%</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" id="yearProgressBar" style="width: 60.8%;"></div>
-                    </div>
-                    <div class="progress-stats">
-                        <div>経過: <strong id="daysPassed">222</strong> 日</div>
-                        <div>残り: <strong id="daysRemaining">143</strong> 日</div>
-                    </div>
-                </section>
+    <!-- Modal for Adding Custom YouTube Video -->
+    <div id="addVideoModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i data-lucide="plus-circle"></i> 番組に動画を追加</h3>
+                <button id="closeModalBtn" class="modal-close"><i data-lucide="x"></i></button>
             </div>
-
-            <!-- World Clock Section -->
-            <section class="card world-clock-card full-width">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i data-lucide="globe"></i>
-                        <span>世界の時間 (World Clock)</span>
-                    </div>
+            <form id="addVideoForm" class="modal-body">
+                <div class="form-group">
+                    <label for="videoUrlInput">YouTube 動画URL または 動画ID</label>
+                    <input type="text" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=..." required>
                 </div>
-                <div class="world-clock-grid" id="worldClockGrid">
-                    <div class="clock-city-card" data-tz="Asia/Tokyo">
-                        <div class="city-name">東京 (Tokyo)</div>
-                        <div class="city-time">12:50</div>
-                        <div class="city-date">8月10日 (月)</div>
-                        <div class="city-offset">JST (UTC+9)</div>
-                    </div>
-                    <div class="clock-city-card" data-tz="America/New_York">
-                        <div class="city-name">ニューヨーク (NY)</div>
-                        <div class="city-time">23:50</div>
-                        <div class="city-date">8月9日 (日)</div>
-                        <div class="city-offset">EDT (UTC-4)</div>
-                    </div>
-                    <div class="clock-city-card" data-tz="Europe/London">
-                        <div class="city-name">ロンドン (London)</div>
-                        <div class="city-time">04:50</div>
-                        <div class="city-date">8月10日 (月)</div>
-                        <div class="city-offset">BST (UTC+1)</div>
-                    </div>
-                    <div class="clock-city-card" data-tz="Europe/Paris">
-                        <div class="city-name">パリ (Paris)</div>
-                        <div class="city-time">05:50</div>
-                        <div class="city-date">8月10日 (月)</div>
-                        <div class="city-offset">CEST (UTC+2)</div>
-                    </div>
-                    <div class="clock-city-card" data-tz="Australia/Sydney">
-                        <div class="city-name">シドニー (Sydney)</div>
-                        <div class="city-time">13:50</div>
-                        <div class="city-date">8月10日 (月)</div>
-                        <div class="city-offset">AEST (UTC+10)</div>
-                    </div>
+                <div class="form-group">
+                    <label for="videoTitleInput">曲名 / タイトル</label>
+                    <input type="text" id="videoTitleInput" placeholder="例: モノポリー (Monopoly)" required>
                 </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer class="app-footer">
-            <p>© 2026 Chronos Today • Created with Antigravity AI</p>
-        </footer>
+                <div class="form-group">
+                    <label for="videoArtistInput">アーティスト名 / グループ名</label>
+                    <input type="text" id="videoArtistInput" placeholder="例: 乃木坂46" required>
+                </div>
+                <div class="form-group">
+                    <label for="videoTagInput">タグ / カテゴリ</label>
+                    <select id="videoTagInput">
+                        <option value="神回">神回</option>
+                        <option value="おすすめMV" selected>おすすめMV</option>
+                        <option value="ライブ映像">ライブ映像</option>
+                        <option value="ダンスパフォーマンス">ダンスパフォーマンス</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelAddBtn" class="btn-secondary">キャンセル</button>
+                    <button type="submit" class="btn-primary">再生リストに追加</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <i data-lucide="check-circle-2"></i>
-        <span id="toastMsg">クリップボードにコピーしました！</span>
-    </div>
-
+    <!-- Load YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script src="script.js"></script>
 </body>
 </html>
