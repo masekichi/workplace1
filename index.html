@@ -33,13 +33,18 @@
                 </div>
                 <h1 class="brand-title">IDOL<span class="highlight">CHANNEL</span> TV</h1>
                 <span class="badge-hd">4K Ultra HD</span>
+                
+                <!-- Global Sync Badge -->
+                <div class="global-sync-badge" title="地球上のすべての視聴者が同じ時間・同じ場面を同時視聴中">
+                    <i data-lucide="globe-2"></i> 全国同時放送中
+                </div>
             </div>
 
             <!-- Program Selector & Quick Switch -->
             <div class="channel-picker">
-                <span class="picker-label"><i data-lucide="radio"></i> チャンネル選局:</span>
+                <span class="picker-label"><i data-lucide="radio"></i> 選局:</span>
                 <button class="channel-btn active" data-channel="sakamichi">
-                    <i data-lucide="sparkles"></i> 坂道・46 SP
+                    <i data-lucide="sparkles"></i> 坂道・AKB SP
                 </button>
                 <button class="channel-btn" data-channel="newwave">
                     <i data-lucide="flame"></i> 令和ブレイクアイドル
@@ -73,9 +78,9 @@
                             <i data-lucide="tv"></i>
                         </div>
                         <h2>IDOL CHANNEL TV を視聴開始</h2>
-                        <p>音声付きで24時間自動連続再生を開始します。<br>お茶の間気分で推し活をお楽しみください。</p>
+                        <p>地球上の全ファンと今この瞬間に同じ画面を同時視聴！<br>24時間連続でお茶の間推し活をお楽しみください。</p>
                         <button id="startBroadcastBtn" class="btn-start-broadcast">
-                            <i data-lucide="play-circle"></i> 番組を視聴する (音声ON)
+                            <i data-lucide="play-circle"></i> 生放送を視聴する (全国同時オンエア)
                         </button>
                     </div>
                 </div>
@@ -89,7 +94,7 @@
                         
                         <!-- Top-Left TV Program Watermark Logo -->
                         <div class="overlay-watermark">
-                            <div class="wm-ch">Ch.04</div>
+                            <div class="wm-ch">Ch.04 • LIVE SYNC</div>
                             <div class="wm-title">IDOL TV LIVE</div>
                         </div>
 
@@ -101,7 +106,7 @@
 
                         <!-- Lower-Left Now Playing Banner -->
                         <div class="overlay-now-playing" id="nowPlayingBanner">
-                            <div class="np-label"><i data-lucide="music"></i> NOW PLAYING</div>
+                            <div class="np-label"><i data-lucide="music"></i> NOW PLAYING (同時放送中)</div>
                             <div class="np-title" id="npTitle">曲名を読み込み中...</div>
                             <div class="np-artist" id="npArtist">アーティスト名</div>
                             <div class="np-meta">
@@ -130,10 +135,10 @@
 
                 <!-- Broadcast Ticker / News Bar -->
                 <div class="broadcast-ticker">
-                    <div class="ticker-badge">速報NEWS</div>
+                    <div class="ticker-badge">生放送中</div>
                     <div class="ticker-content-wrapper">
                         <div class="ticker-content" id="tickerText">
-                            ♪ ただいま「坂道・46グループ Special」を放送中！ ── 次回の特集「令和ブレイクアイドル大集合」は23:00から放送予定！ ── リクエストや感想は右側のリアルタイムチャットから投稿できます！
+                            ♪ 全国同時生放送中！ 全国のファンと同じ曲・同じ場面をリアルタイム同時視聴中！ 右側のチャットで一緒に盛り上がろう！
                         </div>
                     </div>
                 </div>
@@ -165,7 +170,9 @@
                     </div>
 
                     <div class="control-group">
-                        <span class="auto-play-badge"><i data-lucide="repeat"></i> 自動連続再生 ON</span>
+                        <button id="syncNowBtn" class="sync-now-btn" title="全国の放送時間にジャスト同期する">
+                            <i data-lucide="refresh-cw"></i> 放送時間にジャスト同期
+                        </button>
                     </div>
                 </div>
             </section>
@@ -203,8 +210,8 @@
                 <div class="tab-content" id="tabTimetable">
                     <!-- Current Program Schedule Banner -->
                     <div class="timetable-header-card">
-                        <div class="th-title"><i data-lucide="clock-3"></i> 本日のタイムテーブル</div>
-                        <div class="th-desc">時間帯に合わせてテーマ別プレイリストが自動放送されます</div>
+                        <div class="th-title"><i data-lucide="clock-3"></i> 本日のタイムテーブル (全国同時中継)</div>
+                        <div class="th-desc">マスタークロックに基いて全員が同じ秒数で同時試聴しています</div>
                     </div>
 
                     <!-- Video Queue List -->

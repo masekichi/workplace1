@@ -7,7 +7,7 @@ const CHANNELS = {
     sakamichi: {
         name: "坂道・46グループ & AKB48 Special",
         category: "【アイドル大特集】",
-        ticker: "♪ ただいま「坂道・46グループ & AKB48 Special」を絶賛放送中！ 伝説のヒットMV『インフルエンサー』『シンクロニシティ』など24時間オンエア！",
+        ticker: "♪ ただいま「坂道・46グループ & AKB48 Special」を全人類同時放送中！ 伝説のヒットMV『インフルエンサー』『シンクロニシティ』など24時間オンエア！",
         videos: [
             { id: "r4SdiT7mm7Y", title: "インフルエンサー", artist: "乃木坂46", tag: "伝説のMV", duration: "04:45" },
             { id: "fIqKWLyiAc0", title: "シンクロニシティ", artist: "乃木坂46", tag: "レコード大賞", duration: "04:14" },
@@ -20,7 +20,7 @@ const CHANNELS = {
     newwave: {
         name: "令和ブレイクアイドル大集合",
         category: "【注目アイドル】",
-        ticker: "♪ 令和SNSバズアイドル特集！ FRUITS ZIPPER / 超ときめき♡宣伝部 / ME:I などのバズソング連続再生中！",
+        ticker: "♪ 令和SNSバズアイドル特集！ FRUITS ZIPPER / 超ときめき♡宣伝部 / ME:I などのバズソングを全国同時放送中！",
         videos: [
             { id: "NQX2v6F6S5w", title: "わたしの一番かわいいところ", artist: "FRUITS ZIPPER", tag: "SNSバズ", duration: "03:45" },
             { id: "z3x6Z46w-gI", title: "最上級にかわいいの！", artist: "超ときめき♡宣伝部", tag: "神回", duration: "03:15" },
@@ -66,6 +66,40 @@ const FAN_COMMENTS = [
     { name: "フルッパー", text: "みんな可愛すぎて語彙力消えた", badge: "推し活中" }
 ];
 
+// --- Global Master Clock Sync Algorithm ---
+// Calculate exact current video and seek position so ALL viewers worldwide watch the EXACT SAME second!
+function getGlobalSyncPosition() {
+    const channel = CHANNELS[currentChannelKey];
+    let totalDuration = 0;
+    
+    const videoSecs = channel.videos.map(v => {
+        const parts = (v.duration || "03:30").split(':').map(Number);
+        const sec = parts[0] * 60 + (parts[1] || 0);
+        totalDuration += sec;
+        return sec;
+    });
+
+    if (totalDuration === 0) return { index: 0, seek: 0 };
+
+    // Global Fixed Epoch Timestamp (2026-01-01T00:00:00Z)
+    const MASTER_EPOCH_SEC = 1767225600;
+    const currentUnixSec = Math.floor(Date.now() / 1000);
+    const elapsed = Math.max(0, currentUnixSec - MASTER_EPOCH_SEC);
+    const cycleOffset = elapsed % totalDuration;
+
+    let accum = 0;
+    for (let i = 0; i < channel.videos.length; i++) {
+        const dur = videoSecs[i];
+        if (cycleOffset < accum + dur) {
+            const seekTime = cycleOffset - accum;
+            return { index: i, seek: seekTime };
+        }
+        accum += dur;
+    }
+
+    return { index: 0, seek: 0 };
+}
+
 // --- YouTube IFrame API Lifecycle ---
 window.onYouTubeIframeAPIReady = function() {
     console.log("YouTube IFrame API Ready triggered");
@@ -81,7 +115,12 @@ function checkAndInitPlayer() {
 
 function initPlayer() {
     if (player) return;
+    
+    // Calculate global sync position
+    const syncPos = getGlobalSyncPosition();
+    currentVideoIndex = syncPos.index;
     const initialVideo = CHANNELS[currentChannelKey].videos[currentVideoIndex];
+
     player = new YT.Player('player', {
         height: '100%',
         width: '100%',
@@ -93,6 +132,7 @@ function initPlayer() {
             'modestbranding': 1,
             'enablejsapi': 1,
             'playsinline': 1,
+            'start': Math.floor(syncPos.seek),
             'fs': 1
         },
         events: {
@@ -106,6 +146,13 @@ function initPlayer() {
 function onPlayerReady(event) {
     isPlayerReady = true;
     console.log("Player is Ready");
+    
+    // Seek to exact global time offset
+    const syncPos = getGlobalSyncPosition();
+    if (syncPos.seek > 0 && typeof player.seekTo === 'function') {
+        player.seekTo(syncPos.seek, true);
+    }
+    
     updateUIWithCurrentVideo();
     startProgressTimer();
 
@@ -119,7 +166,6 @@ function onPlayerReady(event) {
 
 // Key Event: Continuous Auto-Playback Hook
 function onPlayerStateChange(event) {
-    // YT.PlayerState.ENDED === 0
     if (event.data === YT.PlayerState.ENDED) {
         console.log("Video ended. Play next track automatically!");
         playNextVideo();
@@ -131,13 +177,25 @@ function onPlayerStateChange(event) {
     }
 }
 
-// Robust Auto-Skip Handler for Unembeddable YouTube Videos (Error 101/150/100)
 function onPlayerError(event) {
     console.warn("YouTube Player Error code:", event.data, "Video cannot be embedded in 3rd party site. Auto-skipping to next video...");
-    // Immediately skip to next video so stream is never interrupted!
     setTimeout(() => {
         playNextVideo();
     }, 400);
+}
+
+// Sync to global clock manually
+function syncToGlobalClock() {
+    if (!isPlayerReady || !player) return;
+    const syncPos = getGlobalSyncPosition();
+    if (syncPos.index !== currentVideoIndex) {
+        currentVideoIndex = syncPos.index;
+        const video = CHANNELS[currentChannelKey].videos[currentVideoIndex];
+        player.loadVideoById(video.id, Math.floor(syncPos.seek));
+    } else {
+        player.seekTo(syncPos.seek, true);
+    }
+    updateUIWithCurrentVideo();
 }
 
 // --- Navigation & Playback Logic ---
@@ -167,7 +225,10 @@ function playPrevVideo() {
 function switchChannel(channelKey) {
     if (!CHANNELS[channelKey]) return;
     currentChannelKey = channelKey;
-    currentVideoIndex = 0;
+    
+    // Recalculate sync position for new channel
+    const syncPos = getGlobalSyncPosition();
+    currentVideoIndex = syncPos.index;
 
     // Update Channel Tabs Active Class
     document.querySelectorAll('.channel-btn').forEach(btn => {
@@ -177,7 +238,11 @@ function switchChannel(channelKey) {
     // Update Ticker Text
     document.getElementById('tickerText').textContent = CHANNELS[channelKey].ticker;
 
-    playVideoAtIndex(0);
+    if (isPlayerReady && player) {
+        const video = CHANNELS[currentChannelKey].videos[currentVideoIndex];
+        player.loadVideoById(video.id, Math.floor(syncPos.seek));
+    }
+    updateUIWithCurrentVideo();
 }
 
 // --- UI Updates ---
@@ -218,7 +283,7 @@ function renderPlaylistQueue() {
                     <div class="queue-artist">${vid.artist}</div>
                 </div>
                 <div class="queue-status-badge">
-                    ${isActive ? '再生中' : '#' + (idx + 1)}
+                    ${isActive ? '生放送中' : '#' + (idx + 1)}
                 </div>
             </div>
         `;
@@ -295,13 +360,11 @@ function spawnDanmakuText(text, isMe = false) {
     el.className = `danmaku-item ${isMe ? 'my-comment' : ''}`;
     el.textContent = text;
     
-    // Random vertical position (10% to 75% of screen height)
     const topPos = Math.floor(Math.random() * 65) + 10;
     el.style.top = `${topPos}%`;
 
     overlay.appendChild(el);
 
-    // Remove element after animation finishes (9s)
     setTimeout(() => {
         if (el.parentNode) el.parentNode.removeChild(el);
     }, 9500);
@@ -309,12 +372,10 @@ function spawnDanmakuText(text, isMe = false) {
 
 function startSimulatedFanChat() {
     setInterval(() => {
-        // 45% chance every 4 seconds to spawn a fan comment
         if (Math.random() < 0.45) {
             const randomFan = FAN_COMMENTS[Math.floor(Math.random() * FAN_COMMENTS.length)];
             appendChatMessage(randomFan.name, randomFan.text, randomFan.badge, false);
             
-            // Fluctuate viewer count slightly for realism
             onlineViewers += Math.floor(Math.random() * 7) - 3;
             const onlineEl = document.getElementById('onlineCount');
             if (onlineEl) onlineEl.innerHTML = `<i data-lucide="users"></i> ${onlineViewers.toLocaleString()}人`;
@@ -332,7 +393,6 @@ function escapeHTML(str) {
 // --- Event Listeners Setup ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Check if YT API is already loaded by race condition
     checkAndInitPlayer();
 
     // Live Digital Clock Tick
@@ -350,9 +410,15 @@ document.addEventListener('DOMContentLoaded', () => {
             checkAndInitPlayer();
         }
         if (isPlayerReady && player) {
+            syncToGlobalClock();
             player.unMute();
             player.playVideo();
         }
+    });
+
+    // Sync Now Button
+    document.getElementById('syncNowBtn').addEventListener('click', () => {
+        syncToGlobalClock();
     });
 
     // Channel Switchers

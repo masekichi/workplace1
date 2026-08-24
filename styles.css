@@ -179,6 +179,42 @@ body {
     border-radius: 4px;
 }
 
+.global-sync-badge {
+    font-size: 0.725rem;
+    font-weight: 800;
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 0 10px var(--accent-cyan-glow);
+}
+
+.sync-now-btn {
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition-fast);
+}
+
+.sync-now-btn:hover {
+    background: var(--accent-cyan);
+    color: #000;
+    box-shadow: 0 0 14px var(--accent-cyan-glow);
+}
+
 /* Channel Picker Buttons */
 .channel-picker {
     display: flex;
